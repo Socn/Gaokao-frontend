@@ -11,8 +11,8 @@ export default antfu(
   {
     rules: {
       'eslint-comments/no-unlimited-disable': 'off',
-      'curly': ['error', 'all'],
       'antfu/consistent-list-newline': 'off',
+      'antfu/if-newline': 'off',
     },
   },
   {
