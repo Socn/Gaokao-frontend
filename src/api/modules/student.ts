@@ -8,5 +8,13 @@ export default {
     ) => api.get(`student?name=${name}&id=${id}`, {
       baseURL: '/mock/',
     }),
+    byCondition: (
+      condition: string,
+    ) => api.get(`student/condition?condition=${condition}`, {
+      baseURL: '/mock/',
+    }),
+    all: () => api.get('student/condition?condition=""', {
+      baseURL: '/mock/',
+    }),
   },
 }
