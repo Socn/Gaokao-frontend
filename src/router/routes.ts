@@ -1,7 +1,7 @@
 import { setupLayouts } from 'virtual:meta-layouts'
 import generatedRoutes from 'virtual:generated-pages'
 import type { RouteRecordRaw } from 'vue-router'
-import MultilevelMenuExample from './modules/multilevel.menu.example'
+import StudentMenu from './modules/student.menu.ts'
 import type { Route } from '#/global'
 import useSettingsStore from '@/store/modules/settings'
 
@@ -61,12 +61,10 @@ const systemRoutes: RouteRecordRaw[] = [
 const asyncRoutes: Route.recordMainRaw[] = [
   {
     meta: {
-      title: '演示',
-      icon: 'i-uim:box',
+      title: '学生成绩',
+      icon: 'i-material-symbols:account-circle',
     },
-    children: [
-      MultilevelMenuExample,
-    ],
+    children: StudentMenu,
   },
 ]
 
