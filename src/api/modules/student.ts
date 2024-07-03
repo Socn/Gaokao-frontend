@@ -13,7 +13,7 @@ export default {
     ) => api.get(`student/condition?condition=${condition}`, {
       baseURL: '/mock/',
     }),
-    all: () => api.get('student/condition?condition=""', {
+    all: () => api.get('student/condition?condition=', {
       baseURL: '/mock/',
     }),
   },

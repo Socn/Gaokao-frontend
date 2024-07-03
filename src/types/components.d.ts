@@ -10,6 +10,8 @@ declare module 'vue' {
     Auth: typeof import('./../components/Auth/index.vue')['default']
     AuthAll: typeof import('./../components/AuthAll/index.vue')['default']
     FileUpload: typeof import('./../components/FileUpload/index.vue')['default']
+    FilterSelect: typeof import('./../components/FilterSelect/index.vue')['default']
+    FilterTag: typeof import('./../components/FilterTag/index.vue')['default']
     FixedActionBar: typeof import('./../components/FixedActionBar/index.vue')['default']
     HButton: typeof import('./../layouts/ui-kit/HButton.vue')['default']
     HCheckList: typeof import('./../layouts/ui-kit/HCheckList.vue')['default']
