@@ -8,12 +8,15 @@ import {
   ElButton,
 } from 'element-plus'
 import { debounce, filter } from 'lodash-es'
+import { useSessionStorage } from '@vueuse/core'
 import studentAPI from '../../api/modules/student'
 import type { Student } from '@/interfaces/student'
 import { getSubArray } from '@/utils/subArray'
 import type { FilterSelectElement } from '@/components/FilterSelect'
 import { subjectPropToNameFunc } from '@/utils/subjectPropToName'
 import { type StudentFilter, getWhereClause } from '@/utils/filters'
+
+const router = useRouter()
 
 const loadCnt = 50
 
@@ -22,8 +25,8 @@ let studentList: Array<Student> = []
 const displayList = ref<Array<Student> >([])
 const loading = ref<boolean>(true)
 
-const searchName = ref<string>('')
-const searchID = ref<string>('')
+const searchName = useSessionStorage<string>('searchName', '')
+const searchID = useSessionStorage<string>('searchID', '')
 
 const filterSelector = ref(null as FilterSelectElement | null)
 const filterSelectorVisible = ref(false)
@@ -34,11 +37,12 @@ const filterEditVisible = ref(false)
 const filterEditIndex = ref(-1)
 const filterEditCanReturn = ref(false)
 
-const filters = ref<Array<StudentFilter>>([])
+// const filters = ref<Array<StudentFilter>>([])
+const filters = useSessionStorage<Array<StudentFilter>>('filters', [])
 
-const selected1 = ref<'' | 'physics' | 'history'>('')
-const cnt = ref(0)
-const subjects = ref([
+const selected1 = useSessionStorage<'' | 'physics' | 'history'>('selected1', '')
+const cnt = useSessionStorage('selected2cnt', 0)
+const subjects = useSessionStorage('selected2', [
   {
     prop: 'chemistry',
     selected: false,
@@ -95,40 +99,43 @@ function sortData(data: { column: any, prop: string, order: any }) {
   tableDOM.scrollTo(0, 0)
 }
 
-function searchAll() {
+function searchAll(enableLazyload?: boolean) {
   studentAPI.getGrade.all()
     .then((res: any) => {
       originStudentList = res.students
       studentList = originStudentList
       displayList.value = getSubArray(studentList, 0, 50)
+      if (enableLazyload)lazyload()
     })
 }
-function searchNameID(name: string, id: string) {
+function searchNameID(name: string, id: string, enableLazyload?: boolean) {
   studentAPI.getGrade.byNameId(name, id)
     .then((res: any) => {
       originStudentList = res.students
       studentList = originStudentList
       displayList.value = getSubArray(studentList, 0, 50)
+      if (enableLazyload)lazyload()
     })
 }
-function searchCondition(condition: string) {
+function searchCondition(condition: string, enableLazyload?: boolean) {
   studentAPI.getGrade.byCondition(condition)
     .then((res: any) => {
       originStudentList = res.students
       studentList = originStudentList
       displayList.value = getSubArray(studentList, 0, 50)
+      if (enableLazyload)lazyload()
     })
 }
 
-function searchStudent() {
+function searchStudent(enableLazyload?: boolean) {
   loading.value = true
   // no filters
   if (searchName.value === '' && searchID.value === '' && selected1.value === '' && cnt.value === 0 && filters.value.length === 0) {
-    searchAll()
+    searchAll(enableLazyload)
   }
   // Only Name & ID
   else if (selected1.value === '' && cnt.value === 0 && filters.value.length === 0) {
-    searchNameID(searchName.value, searchID.value)
+    searchNameID(searchName.value, searchID.value, enableLazyload)
   }
   else {
     // with filters
@@ -154,12 +161,9 @@ function searchStudent() {
     if (subjectWhereClause === '')finalWhereClause = filterWhereClause
     else if (filterWhereClause === '')finalWhereClause = subjectWhereClause
     else finalWhereClause = `${subjectWhereClause} AND ${filterWhereClause}`
-    searchCondition(finalWhereClause)
+    searchCondition(finalWhereClause, enableLazyload)
   }
   loading.value = false
-  nextTick(() => {
-    lazyload()
-  })
 }
 const debouncedSearch = debounce(searchStudent, 250)
 
@@ -208,15 +212,17 @@ function handleEditFilterClose() {
 }
 
 // Get all students without filters on loading
-studentAPI.getGrade.all()
-  .then((res: any) => {
-    originStudentList = res.students
-    studentList = originStudentList
-    displayList.value = getSubArray(studentList, 0, 50)
-    nextTick(() => {
-      lazyload()
-    })
+
+searchStudent(true)
+
+function handleJump(row: any) {
+  router.push({
+    path: '/students/info',
+    query: {
+      id: row.id,
+    },
   })
+}
 </script>
 
 <template>
@@ -277,16 +283,16 @@ studentAPI.getGrade.all()
             style="width: 240px;"
             placeholder="姓名"
             clearable
-            @change="debouncedSearch"
+            @change="debouncedSearch()"
           />
           <el-input
             v-model="searchID"
             style="width: 240px;"
             placeholder="学号"
             clearable
-            @change="debouncedSearch"
+            @change="debouncedSearch()"
           />
-          <ElButton @click="debouncedSearch">
+          <ElButton @click="debouncedSearch()">
             确定
           </ElButton>
         </el-space>
@@ -336,6 +342,16 @@ studentAPI.getGrade.all()
         <el-table-column prop="biology" label="生物" min-width="80" sortable="custom" />
         <el-table-column prop="politics" label="政治" min-width="80" sortable="custom" />
         <el-table-column prop="geography" label="地理" min-width="80" sortable="custom" />
+        <el-table-column label="操作" min-width="80" fixed="right">
+          <template #default="scope">
+            <ElButton link type="primary" size="small" @click="handleJump(scope.row)">
+              查看详细
+            </ElButton>
+          </template>
+        </el-table-column>
+        <template #append>
+          <ElButton type="text" loading style="width: 100%;height: 56px;font-size: 16px;" size="large" />
+        </template>
       </el-table>
     </PageMain>
   </div>
