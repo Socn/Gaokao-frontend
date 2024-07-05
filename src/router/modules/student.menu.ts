@@ -50,19 +50,20 @@ const routes: Array<RouteRecordRaw> = [
     ],
   },
   {
-    path: '/students/info',
+    path: '/students/detail/:id',
     component: Layout,
-    redirect: '/students/info',
-    name: 'info',
+    redirect: '/students/detail',
+    name: 'detail',
     meta: {
       title: '学生详细',
       icon: 'i-material-symbols:person',
+      menu: false,
     },
     children: [
       {
         path: '',
-        name: 'infoPage',
-        component: () => import('@/views/student_menu/info.vue'),
+        name: 'detailPage',
+        component: () => import('@/views/student_menu/detail.vue'),
         meta: {
           title: '学生详细',
           menu: false,
