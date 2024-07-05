@@ -125,14 +125,14 @@ defineExpose({
     <div
       v-for="(filter, index) in filters" :key="index" style="display: flex; flex-direction: row; margin-bottom: 8px;"
     >
-      <div style="width: 20px; height: 32px; margin-right: 8px;">
+      <div style="width: 24px; height: 32px; margin-right: 8px;">
         <span v-if="index !== 0" style="line-height: 32px;">且</span>
       </div>
       <div style="display: flex; flex-direction: column; margin-right: 8px;">
         <el-select
           v-model="filter.subjects"
           placeholder="选择科目"
-          style="width: 120px;"
+          style="width: 100px;"
           multiple
           value-key="prop"
           @change="(value: any) => handleChange(value, filter)"
@@ -152,13 +152,13 @@ defineExpose({
           </el-option-group>
         </el-select>
       </div>
-      <div style="width: 80px; height: 32px;  margin-right: 8px; line-height: 32px;">
+      <div style="width: 100px; height: 32px;  margin-right: 8px; line-height: 32px;">
         <span>{{ `${filter.type === 'single' ? '分数' : '总分'}介于` }}</span>
       </div>
       <div class="slider" style="display: flex; flex-direction: row;width: 100%; height: 32px; margin-right: 8px;">
-        <el-input v-model="filter.constrains[0]" maxlength="3" style="width: 100px;" />
-        <el-slider v-model="filter.constrains" range :max="calcFullscore(filter)" style=" margin-right: 16px;margin-left: 16px;" :step="0.5" />
-        <el-input v-model="filter.constrains[1]" maxlength="3" style="width: 100px;" />
+        <el-input v-model="filter.constrains[0]" maxlength="3" style="min-width: 60px;max-width: 70px;" />
+        <el-slider v-model="filter.constrains" range :max="calcFullscore(filter)" style=" min-width: 250px; margin-right: 16px;margin-left: 16px;" :step="0.5" />
+        <el-input v-model="filter.constrains[1]" maxlength="3" style="min-width: 60px;max-width: 70px;" />
       </div>
       <ElButton text style=" width: 32px;" type="danger" @click="removeFilter(index)">
         <i class="i-material-symbols:delete" style="font-size: 16px;" />
