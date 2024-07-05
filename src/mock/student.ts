@@ -1,5 +1,6 @@
 import { defineFakeRoute } from 'vite-plugin-fake-server/client'
 import { shuffle } from 'lodash-es'
+import Mock from 'mockjs'
 import type { Student } from '@/interfaces/student'
 import randomGrade from '@/utils/randomGrade'
 
@@ -11,7 +12,7 @@ function initStudentList() {
     const chose2 = Math.floor(Math.random() * 2)
     const chose4 = shuffle([randomGrade(60, 100), randomGrade(60, 100), -1, -1])
     const stu: Student = {
-      name: (i % 400).toString(),
+      name: Mock.mock('@cname'),
       id: (i + 302111000).toString(),
       chinese: randomGrade(50, 150),
       math: randomGrade(50, 150),
