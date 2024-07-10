@@ -7,8 +7,8 @@ export default defineFakeRoute([
     method: 'post',
     response: ({ body }) => {
       return {
-        error: '',
-        status: 1,
+        message: '',
+        success: true,
         data: Mock.mock({
           account: body.account,
           token: `${body.account}_@string`,
@@ -28,6 +28,8 @@ export default defineFakeRoute([
           'permission.create',
           'permission.edit',
           'permission.remove',
+          'grade.edit',
+          'grade.add',
         ]
       }
       else if (headers.token?.indexOf('test') === 0) {
@@ -36,8 +38,8 @@ export default defineFakeRoute([
         ]
       }
       return {
-        error: '',
-        status: 1,
+        message: '',
+        success: true,
         data: {
           permissions,
         },
@@ -49,8 +51,8 @@ export default defineFakeRoute([
     method: 'post',
     response: () => {
       return {
-        error: '',
-        status: 1,
+        message: '',
+        success: true,
         data: {
           isSuccess: true,
         },
