@@ -39,12 +39,12 @@ api.interceptors.response.use(
      * 请求出错时 error 会返回错误信息
      */
     if (response.data.success !== true) {
-      if (response.data.error !== '') {
+      if (response.data.message !== '') {
         // 错误提示
-        Message.error(response.data.error, {
-          zIndex: 2000,
-        })
-        return Promise.reject(response.data)
+        // Message.error(response.data.error, {
+        //   zIndex: 2000,
+        // })
+        return Promise.resolve(response.data)
       }
     }
     return Promise.resolve(response.data)
