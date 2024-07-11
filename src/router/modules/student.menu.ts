@@ -35,6 +35,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       title: '搜索',
       icon: 'i-material-symbols:search',
+      cache: ['detail', 'detailPage'],
     },
     children: [
       {
@@ -45,6 +46,7 @@ const routes: Array<RouteRecordRaw> = [
           title: '搜索',
           menu: false,
           breadcrumb: false,
+          cache: ['detail', 'detailPage'],
         },
       },
     ],
