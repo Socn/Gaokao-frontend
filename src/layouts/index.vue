@@ -203,7 +203,7 @@ const enableAppSetting = import.meta.env.VITE_APP_SETTING === 'true'
       position: relative;
       flex: auto;
       height: calc(100vh - var(--g-toolbar-height));
-      overflow: hidden;
+      overflow: scroll;
       transition: 0.3s;
     }
 
