@@ -41,7 +41,7 @@ jobs:
         uses: thedoctor0/zip-release@main
         with:
           type: zip
-          filename: fantastic-admin.${{ steps.last_release.outputs.tag_name }}.zip
+          filename: gaokao.${{ steps.last_release.outputs.tag_name }}.zip
           exclusions: '/.git/* /.github/*'
 
       - name: Upload Archive To Release
@@ -51,7 +51,7 @@ jobs:
         with:
           release_id: ${{ steps.last_release.outputs.id }}
           draft: false
-          file: fantastic-admin.${{ steps.last_release.outputs.tag_name }}.zip
+          file: gaokao.${{ steps.last_release.outputs.tag_name }}.zip
 
   upload-archive-example:
     needs: release
@@ -74,7 +74,7 @@ jobs:
         uses: thedoctor0/zip-release@main
         with:
           type: zip
-          filename: fantastic-admin.example.${{ steps.last_release.outputs.tag_name }}.zip
+          filename: gaokao-example.${{ steps.last_release.outputs.tag_name }}.zip
           exclusions: '/.git/* /.github/* /public/.github/* /public/.nojekyll'
 
       - name: Upload Archive To Release
@@ -84,4 +84,4 @@ jobs:
         with:
           release_id: ${{ steps.last_release.outputs.id }}
           draft: false
-          file: fantastic-admin.example.${{ steps.last_release.outputs.tag_name }}.zip
+          file: gaokao-example.${{ steps.last_release.outputs.tag_name }}.zip
