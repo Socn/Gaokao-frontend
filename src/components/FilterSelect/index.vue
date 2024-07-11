@@ -32,6 +32,11 @@ const subjectList: Array<{ limit: number, subjects: Array<{ subject: Subject, se
     { subject: { prop: 'politics' }, selected: 0 },
     { subject: { prop: 'geography' }, selected: 0 },
   ],
+}, {
+  limit: 1,
+  subjects: [
+    { subject: { prop: 'sum' }, selected: 0 },
+  ],
 }]
 
 interface WrappedStudentFilter extends StudentFilter {
@@ -88,6 +93,12 @@ function handleTest(item: { subject: Subject, selected: number }, groupIndex: nu
   }
 }
 function checkDisabled(item: { subject: Subject, selected: number }, groupLimit: number, groupIndex: number) {
+  if (subjectList[3].subjects[0].selected) {
+    return item.subject.prop !== 'sum'
+  }
+  if (item.subject.prop === 'sum') {
+    return (subjectCount[0] + subjectCount[1] + subjectCount[2]) > 0
+  }
   return item.selected === 0 && subjectCount[groupIndex] >= groupLimit
 }
 

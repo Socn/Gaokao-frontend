@@ -1,5 +1,5 @@
 export interface Subject {
-  prop: 'chinese' | 'math' | 'english' | 'physics' | 'history' | 'chemistry' | 'biology' | 'politics' | 'geography'
+  prop: 'chinese' | 'math' | 'english' | 'physics' | 'history' | 'chemistry' | 'biology' | 'politics' | 'geography' | 'sum'
 }
 
 export const subjectFullscore = new Map(Object.entries({
@@ -12,4 +12,5 @@ export const subjectFullscore = new Map(Object.entries({
   biology: 100,
   politics: 100,
   geography: 100,
+  sum: 750,
 }))

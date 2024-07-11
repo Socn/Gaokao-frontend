@@ -1,4 +1,5 @@
 import api from '../index'
+import type { StudentC } from '@/interfaces/student'
 
 export default {
   getGrade: {
@@ -17,4 +18,10 @@ export default {
       baseURL: '/mock/',
     }),
   },
+  editGrade: (stu: StudentC) => api.post('student/edit', stu.toAPIResponse(), {
+    baseURL: '/mock/',
+  }),
+  addGrade: (stu: StudentC) => api.post('student/add', stu.toAPIResponse(), {
+    baseURL: '/mock/',
+  }),
 }

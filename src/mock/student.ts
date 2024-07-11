@@ -1,17 +1,17 @@
 import { defineFakeRoute } from 'vite-plugin-fake-server/client'
 import { shuffle } from 'lodash-es'
 import Mock from 'mockjs'
-import type { Student } from '@/interfaces/student'
+import type { Student, StudentAPIResponse } from '@/interfaces/student'
 import randomGrade from '@/utils/randomGrade'
 
 const studentNum = 500
-const studentList: Array<Student> = []
+const studentList: Array<StudentAPIResponse> = []
 
 function initStudentList() {
   for (let i = 1; i <= studentNum; i++) {
     const chose2 = Math.floor(Math.random() * 2)
     const chose4 = shuffle([randomGrade(60, 100), randomGrade(60, 100), -1, -1])
-    const stu: Student = {
+    const stu: StudentAPIResponse = {
       name: Mock.mock('@cname'),
       id: (i + 302111000).toString(),
       chinese: randomGrade(50, 150),
@@ -58,6 +58,34 @@ export default defineFakeRoute([
       return {
         success: true,
         students: studentList,
+      }
+    },
+  },
+  {
+    url: '/mock/student/edit',
+    method: 'POST',
+    response: (request) => {
+      return {
+        success: true,
+        student: request.body,
+      }
+    },
+  },
+  {
+    url: '/mock/student/add',
+    method: 'POST',
+    response: (request: any) => {
+      const random = Math.random()
+      if (random > 0.9) {
+        return {
+          success: false,
+          message: 'fake',
+        }
+      }
+      studentList.push(request.body)
+      return {
+        success: true,
+        student: request.body,
       }
     },
   },
