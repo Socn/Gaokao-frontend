@@ -80,7 +80,8 @@ function sortData(data: { column: any, prop: string, order: any }) {
     return
   }
   const propList = data.prop.split('.')
-  const prop = propList[propList.length - 1]
+  let prop = propList[propList.length - 1]
+  if (prop === 'gradeSum')prop = 'sum'
   loading.value = true
 
   return new Promise((resolve) => {
@@ -88,7 +89,7 @@ function sortData(data: { column: any, prop: string, order: any }) {
     if (data.order === 'ascending')inverse = -1
     const filteredList = _filterList(data, prop)
     _sortList(filteredList, prop, inverse)
-    setTimeout(() => resolve(filteredList), 1000)
+    resolve(filteredList)
   }).then((data: any) => {
     studentList = data
     displayList.value = getSubArray(studentList, 0, 50)
@@ -159,7 +160,7 @@ watchEffect(() => {
       <el-table-column prop="groups.third.grade.biology" label="生物" min-width="80" sortable="custom" />
       <el-table-column prop="groups.third.grade.politics" label="政治" min-width="80" sortable="custom" />
       <el-table-column prop="groups.third.grade.geography" label="地理" min-width="80" sortable="custom" />
-      <el-table-column prop="gradeSum" label="总分" min-width="80" sortable="custom" />
+      <el-table-column prop="gradeSum" label="总分" min-width="80" sortable="custom" fixed="right" />
       <slot name="column" />
       <template #append>
         <slot name="append" />
