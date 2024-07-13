@@ -150,6 +150,7 @@ function searchStudent(): Promise<boolean> {
   })
 }
 const debouncedSearch = debounce(searchStudent, 250)
+const throttledSearch = throttle(searchStudent, 500)
 
 function select2(prop: 'physics' | 'history') {
   selected1.value = selected1.value === prop ? '' : prop
@@ -360,7 +361,7 @@ function handleJump(row: any) {
       <el-tooltip
         content="刷新"
       >
-        <ElButton circle style="position: absolute; top: 16px; right: 16px;" @click="searchStudent">
+        <ElButton circle style="position: absolute; top: 16px; right: 16px;" @click="throttledSearch">
           <div class="i-material-symbols:refresh" />
         </ElButton>
       </el-tooltip>
