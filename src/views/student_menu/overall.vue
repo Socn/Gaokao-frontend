@@ -8,7 +8,6 @@ import VChart from '@visactor/vchart'
 import type { IOrientType } from '@visactor/vchart/esm/typings'
 import type { IFilterMode } from '@visactor/vchart/esm/component/data-zoom'
 import { debounce } from 'lodash-es'
-import type { ICrosshairLineSpec } from '@visactor/vchart/esm/component/crosshair'
 import type { AxisType } from '@visactor/vchart/esm/component/axis'
 import type { StudentAPIResponse } from '@/interfaces/student'
 import { StudentC } from '@/interfaces/student'
@@ -42,6 +41,13 @@ const gradeRange = ref<Map<string, Array<{
   count: number
   name: string
 }>>())
+const gradeInfo = ref<Map<string, {
+  count: number
+  sum: number
+}>>(new Map<string, {
+  count: number
+  sum: number
+}>())
 const gradeSplit = ref<number>(5)
 
 const subjectChoices: Map<string, number> = new Map<string, number>()
@@ -89,6 +95,12 @@ function getGradeSplit() {
       const index = Math.floor(Number(prop[1]) / gradeSplit.value)
       array[index].count++
       gradeRange.value?.set(prop[0], array)
+
+      const oldGradeInfo = gradeInfo.value.get(prop[0])
+      gradeInfo.value.set(prop[0], {
+        count: (oldGradeInfo?.count ?? 0) + 1,
+        sum: (oldGradeInfo?.sum ?? 0) + Number(prop[1]),
+      })
     })
   })
 }
@@ -160,16 +172,7 @@ function displayChart() {
         ],
       },
       dimension: {
-        title: {
-          key: 'title',
-          value: (datum: any) => (subjectPropToName.get(datum.name) ?? ''),
-        },
-        content: [
-          {
-            key: (datum: any) => `${datum.start}~${datum.end}`,
-            value: (datum: any) => datum.count,
-          },
-        ],
+        visible: false,
       },
     },
     dataZoom: [
@@ -358,13 +361,7 @@ function displayScatterChart() {
     ],
     tooltip: {
       dimension: {
-        visible: true,
-        content: [
-          {
-            key: (d: any) => d.name,
-            value: (d: any) => d.ySum,
-          },
-        ],
+        visible: false,
       },
       mark: {
         content: [
@@ -417,7 +414,7 @@ function displayScatterChart() {
     ],
   }
   if (scatterChart === undefined) {
-    scatterChart = new VChart(spec, { dom: 'scatter' })
+    scatterChart = new VChart(spec, { dom: 'scatter', animation: false })
     scatterChart.renderSync()
   }
   else {
@@ -482,6 +479,12 @@ function handleSwitchSubject() {
           </el-space>
         </el-space>
         <div>
+          <span>
+            共{{ (gradeInfo.get(subject)?.count ?? 0) }}条成绩，
+            平均{{ ((gradeInfo.get(subject)?.sum ?? 0) / (gradeInfo.get(subject)?.count ?? 1)).toFixed(3) }}分
+          </span>
+        </div>
+        <div>
           <div id="histogram" style="height: 400px;" />
         </div>
       </div>
@@ -491,11 +494,19 @@ function handleSwitchSubject() {
         <el-space style="margin-top: 8px;">
           <div>
             <span>横轴：</span>
-            <SelectSubject :obj="xSubjects" :on-change="(value: any) => handleSubjectsChange(value, xSubjects)" style="width: 200px;" />
+            <SelectSubject
+              :obj="xSubjects"
+              :on-change="(value: any) => handleSubjectsChange(value, xSubjects)"
+              style="width: 200px;"
+            />
           </div>
           <div>
             <span>纵轴：</span>
-            <SelectSubject :obj="ySubjects" :on-change="(value: any) => handleSubjectsChange(value, ySubjects)" style="width: 200px;" />
+            <SelectSubject
+              :obj="ySubjects"
+              :on-change="(value: any) => handleSubjectsChange(value, ySubjects)"
+              style="width: 200px;"
+            />
           </div>
         </el-space>
         <div>
