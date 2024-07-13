@@ -7,10 +7,14 @@ meta:
 import VChart from '@visactor/vchart'
 import type { IOrientType } from '@visactor/vchart/esm/typings'
 import type { IFilterMode } from '@visactor/vchart/esm/component/data-zoom'
+import { debounce } from 'lodash-es'
+import type { ICrosshairLineSpec } from '@visactor/vchart/esm/component/crosshair'
+import type { AxisType } from '@visactor/vchart/esm/component/axis'
 import type { StudentAPIResponse } from '@/interfaces/student'
 import { StudentC } from '@/interfaces/student'
 import studentAPI from '@/api/modules/student'
-import { subjectPropToName } from '@/utils/subjectPropToName'
+import { subjectPropToName, subjectPropToNameFunc } from '@/utils/subjectPropToName'
+import type { Subject } from '@/interfaces/subject'
 import { subjectFullscore } from '@/interfaces/subject'
 
 const studentList = ref<Array<{
@@ -44,6 +48,15 @@ const subjectChoices: Map<string, number> = new Map<string, number>()
 
 const subject = ref<string>('chinese')
 const subjects = Array.from(subjectPropToName)
+
+const xSubjects = ref({
+  subjectCount: [0, 0, 0],
+  subjects: new Array<Subject>(),
+})
+const ySubjects = ref({
+  subjectCount: [0, 0, 0],
+  subjects: new Array<Subject>(),
+})
 
 let vchart: VChart
 function getInitGradeRange(prop: string, maxGrade: number) {
@@ -283,6 +296,140 @@ function displayPieChart() {
   piechart.renderSync()
 }
 
+let scatterChart: VChart
+function getScatterData() {
+  if (xSubjects.value.subjects.length === 0 || ySubjects.value.subjects.length === 0) return []
+  const ret: Array<{
+    name: string
+    xSum: number
+    ySum: number
+  }> = []
+  const x = xSubjects.value.subjects
+  const y = ySubjects.value.subjects
+  studentList.value.forEach((element) => {
+    let ok = true
+    let xSum = 0
+    let ySum = 0
+    x.forEach((sub) => {
+      const grade = element[sub.prop]
+      if (grade === -1)ok = false
+      else xSum += element[sub.prop]
+    })
+    y.forEach((sub) => {
+      const grade = element[sub.prop]
+      if (grade === -1)ok = false
+      else ySum += element[sub.prop]
+    })
+    if (ok) {
+      ret.push({
+        name: element.name,
+        xSum,
+        ySum,
+      })
+    }
+  })
+  return ret
+}
+const axisType: AxisType = 'linear'
+function displayScatterChart() {
+  let xTitle = ''
+  let yTitle = ''
+  xSubjects.value.subjects.forEach(sub => xTitle += subjectPropToNameFunc(sub.prop))
+  ySubjects.value.subjects.forEach(sub => yTitle += subjectPropToNameFunc(sub.prop))
+  const spec = {
+    type: 'common',
+    series: [
+      {
+        type: 'scatter',
+        xField: 'xSum',
+        yField: 'ySum',
+        point: {
+          state: {
+            hover: {
+              scaleX: 1.2,
+              scaleY: 1.2,
+            },
+          },
+          style: {
+            fillOpacity: 0.25,
+          },
+        },
+      },
+    ],
+    tooltip: {
+      dimension: {
+        visible: true,
+        content: [
+          {
+            key: (d: any) => d.name,
+            value: (d: any) => d.ySum,
+          },
+        ],
+      },
+      mark: {
+        content: [
+          {
+            key: (d: any) => d.name,
+            value: (d: any) => d.ySum,
+          },
+        ],
+      },
+    },
+    crosshair: {
+      yField: {
+        visible: true,
+        label: {
+          visible: true, // label 默认关闭
+        },
+      },
+      xField: {
+        visible: true,
+        label: {
+          visible: true, // label 默认关闭
+        },
+      },
+    },
+    axes: [
+      {
+        title: {
+          visible: true,
+          text: yTitle,
+        },
+        orient: 'left',
+        range: { min: 0 },
+        type: axisType,
+      },
+      {
+        title: {
+          visible: true,
+          text: xTitle,
+        },
+        orient: 'bottom',
+        label: { visible: true },
+        type: axisType,
+      },
+    ],
+    data: [
+      {
+        id: 'data',
+        values: getScatterData(),
+      },
+    ],
+  }
+  if (scatterChart === undefined) {
+    scatterChart = new VChart(spec, { dom: 'scatter' })
+    scatterChart.renderSync()
+  }
+  else {
+    scatterChart.updateSpec(spec)
+  }
+}
+const debouncedDisplayScatter = debounce(displayScatterChart, 500)
+function handleSubjectsChange(value: any, obj: any) {
+  obj.value = value
+  debouncedDisplayScatter()
+}
+
 function getInfo() {
   studentAPI.getGrade.all()
     .then((res: any) => {
@@ -294,6 +441,7 @@ function getInfo() {
       getSubjectChoiceCount()
       displayChart()
       displayPieChart()
+      displayScatterChart()
     })
 }
 
@@ -335,6 +483,23 @@ function handleSwitchSubject() {
         </el-space>
         <div>
           <div id="histogram" style="height: 400px;" />
+        </div>
+      </div>
+      <el-divider />
+      <div style="display: flex; flex-direction: column;">
+        <span style="font-size: var(--el-font-size-large);">分数关系</span>
+        <el-space style="margin-top: 8px;">
+          <div>
+            <span>横轴：</span>
+            <SelectSubject :obj="xSubjects" :on-change="(value: any) => handleSubjectsChange(value, xSubjects)" style="width: 200px;" />
+          </div>
+          <div>
+            <span>纵轴：</span>
+            <SelectSubject :obj="ySubjects" :on-change="(value: any) => handleSubjectsChange(value, ySubjects)" style="width: 200px;" />
+          </div>
+        </el-space>
+        <div>
+          <div id="scatter" style="height: 400px;" />
         </div>
       </div>
     </PageMain>
