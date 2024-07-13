@@ -3,22 +3,23 @@ import { shuffle } from 'lodash-es'
 import Mock from 'mockjs'
 import type { Student, StudentAPIResponse } from '@/interfaces/student'
 import randomGrade from '@/utils/randomGrade'
+import { generateNormalDistribution } from '@/utils/normalDistribution'
 
-const studentNum = 500
+const studentNum = 5000
 const studentList: Array<StudentAPIResponse> = []
 
 function initStudentList() {
   for (let i = 1; i <= studentNum; i++) {
     const chose2 = Math.floor(Math.random() * 2)
-    const chose4 = shuffle([randomGrade(60, 100), randomGrade(60, 100), -1, -1])
+    const chose4 = shuffle([randomGrade(60, 100, 80, 20), randomGrade(60, 100, 80, 20), -1, -1])
     const stu: StudentAPIResponse = {
       name: Mock.mock('@cname'),
       id: (i + 302111000).toString(),
-      chinese: randomGrade(50, 150),
-      math: randomGrade(50, 150),
-      english: randomGrade(50, 150),
-      physics: chose2 === 0 ? randomGrade(60, 100) : -1,
-      history: chose2 === 1 ? randomGrade(40, 100) : -1,
+      chinese: randomGrade(50, 150, 90, 60),
+      math: randomGrade(50, 150, 80, 70),
+      english: randomGrade(50, 150, 110, 60),
+      physics: chose2 === 0 ? randomGrade(60, 100, 80, 20) : -1,
+      history: chose2 === 1 ? randomGrade(40, 100, 70, 30) : -1,
       chemistry: chose4[0],
       biology: chose4[1],
       geography: chose4[2],
