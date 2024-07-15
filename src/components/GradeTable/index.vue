@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Student, StudentC } from '@/interfaces/student'
+import type { StudentC } from '@/interfaces/student'
 import { getSubArray } from '@/utils/subArray'
 
 const props = withDefaults(defineProps<{
@@ -131,6 +131,52 @@ watchEffect(() => {
 watchEffect(() => {
   if (props.enableLazyload)lazyload()
 })
+
+const averages = ref<Array<string>>([])
+function getAverages() {
+  if (props.data.length === 0 || props.loading) return
+  const entries = Object.entries(props.data[0].toSimpleObj())
+  entries.forEach((prop, index) => {
+    if (index === 0 || index === 1) return
+    if (entries[index] === undefined) return
+    let cnt: number = 0
+    averages.value[index + 1] = (props.data.reduce((prev, curr) => {
+      const value = Object.entries(curr.toSimpleObj())[index][1]
+      if (!Number.isNaN(value) && Number(value) !== -1) {
+        cnt++
+        return prev + Number(value)
+      }
+      else {
+        return prev
+      }
+    }, 0) / cnt).toFixed(3)
+  })
+}
+
+watchEffect(() => {
+  getAverages()
+})
+
+function getSummaries(param: { columns: any[], data: any[] }) {
+  const columns = param.columns
+  const sums: (string | VNode)[] = []
+  columns.forEach((column, index) => {
+    if (index === 0) {
+      sums[index] = h('div', { style: { textDecoration: 'underline' } }, [
+        '平均分',
+      ])
+      return
+    }
+    if (index === 1 || index === 2) {
+      sums[index] = h('div')
+      return
+    }
+
+    sums[index] = averages.value[index]
+  })
+
+  return sums
+}
 </script>
 
 <template>
@@ -140,8 +186,9 @@ watchEffect(() => {
       style="width: 100%;" :cell-class-name="filterInvalid" :row-style="{ height: '54px' }"
       :cell-style="{ padding: 0 }"
       :max-height="props.maxTableHeight"
-      @sort-change="sortData"
-      @selection-change="props.selectionChange"
+      show-summary
+      :summary-method="getSummaries"
+      @sort-change="sortData" @selection-change="props.selectionChange"
     >
       <slot name="pre-append" />
       <el-table-column label="序号" fixed>
