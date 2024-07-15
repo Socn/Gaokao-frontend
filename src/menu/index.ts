@@ -1,15 +1,15 @@
-import MultilevelMenuExample from './modules/multilevel.menu.example'
+import StudentMenu from './modules/student.menu'
 
 import type { Menu } from '#/global'
 
 const menu: Menu.recordMainRaw[] = [
   {
     meta: {
-      title: '演示',
+      title: '高考成绩管理系统',
       icon: 'uim:box',
     },
     children: [
-      MultilevelMenuExample,
+      StudentMenu,
     ],
   },
 ]
