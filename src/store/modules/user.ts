@@ -12,9 +12,9 @@ const useUserStore = defineStore(
     const routeStore = useRouteStore()
     const menuStore = useMenuStore()
 
-    const account = ref(localStorage.account ?? '')
+    const name = ref(localStorage.name ?? '')
     const token = ref(localStorage.token ?? '')
-    const avatar = ref(localStorage.avatar ?? '')
+    const role = ref(localStorage.role ?? '')
     const permissions = ref<string[]>([])
     const isLogin = computed(() => {
       if (token.value) {
@@ -25,25 +25,25 @@ const useUserStore = defineStore(
 
     // 登录
     async function login(data: {
-      account: string
+      name: string
       password: string
     }) {
-      const res = await apiUser.login(data)
-      localStorage.setItem('account', res.data.account)
+      const res: any = await apiUser.login(data)
+      localStorage.setItem('name', res.data.user.name)
       localStorage.setItem('token', res.data.token)
-      localStorage.setItem('avatar', res.data.avatar)
-      account.value = res.data.account
+      localStorage.setItem('role', res.data.user.role)
+      name.value = res.data.user.name
       token.value = res.data.token
-      avatar.value = res.data.avatar
+      role.value = res.data.user.role
     }
     // 登出
     async function logout(redirect = router.currentRoute.value.fullPath) {
-      localStorage.removeItem('account')
+      localStorage.removeItem('name')
       localStorage.removeItem('token')
-      localStorage.removeItem('avatar')
-      account.value = ''
+      localStorage.removeItem('role')
+      name.value = ''
       token.value = ''
-      avatar.value = ''
+      role.value = ''
       permissions.value = []
       routeStore.removeRoutes()
       menuStore.setActived(0)
@@ -59,24 +59,16 @@ const useUserStore = defineStore(
       const res = await apiUser.permission()
       permissions.value = res.data.permissions
     }
-    // 修改密码
-    async function editPassword(data: {
-      password: string
-      newpassword: string
-    }) {
-      await apiUser.passwordEdit(data)
-    }
 
     return {
-      account,
+      name,
       token,
-      avatar,
+      role,
       permissions,
       isLogin,
       login,
       logout,
       getPermissions,
-      editPassword,
     }
   },
 )

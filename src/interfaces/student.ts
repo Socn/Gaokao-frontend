@@ -1,5 +1,9 @@
 import { getSubArray } from '@/utils/subArray'
 
+function multiply(num: number, mul: number) {
+  return num === -1 ? -1 : num * mul
+}
+
 export interface StudentAPIResponse {
   [key: string]: string | number
   name: string
@@ -196,19 +200,19 @@ export class StudentC implements Student {
     return this
   }
 
-  public toAPIResponse(): StudentAPIResponse {
+  public toAPIResponse(multi?: number): StudentAPIResponse {
     return {
       name: String(this.name),
       id: String(this.id),
-      chinese: Number(this.groups.main.grade.chinese),
-      math: Number(this.groups.main.grade.math),
-      english: Number(this.groups.main.grade.english),
-      physics: Number(this.groups.second.grade.physics),
-      history: Number(this.groups.second.grade.history),
-      chemistry: Number(this.groups.third.grade.chemistry),
-      biology: Number(this.groups.third.grade.biology),
-      politics: Number(this.groups.third.grade.politics),
-      geography: Number(this.groups.third.grade.geography),
+      chinese: multiply(Number(this.groups.main.grade.chinese), multi ?? 1),
+      math: multiply(Number(this.groups.main.grade.math), multi ?? 1),
+      english: multiply(Number(this.groups.main.grade.english), multi ?? 1),
+      physics: multiply(Number(this.groups.second.grade.physics), multi ?? 1),
+      history: multiply(Number(this.groups.second.grade.history), multi ?? 1),
+      chemistry: multiply(Number(this.groups.third.grade.chemistry), multi ?? 1),
+      biology: multiply(Number(this.groups.third.grade.biology), multi ?? 1),
+      politics: multiply(Number(this.groups.third.grade.politics), multi ?? 1),
+      geography: multiply(Number(this.groups.third.grade.geography), multi ?? 1),
     }
   }
 

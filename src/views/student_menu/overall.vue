@@ -86,15 +86,16 @@ function getGradeSplit() {
     array.forEach((prop) => {
       if (prop[0] === 'name' || prop[0] === 'id') return
 
-      let array
-      if (gradeRange.value?.has(prop[0]))array = gradeRange.value?.get(prop[0])
-      else array = getInitGradeRange(prop[0], subjectFullscore.get(prop[0]) ?? 0)
-      if (array === undefined) return
+      let arr
+      if (gradeRange.value?.has(prop[0]))arr = gradeRange.value?.get(prop[0])
+      else arr = getInitGradeRange(prop[0], subjectFullscore.get(prop[0]) ?? 0)
+      if (arr === undefined) return
 
       if (prop[1] === -1) return
-      const index = Math.floor(Number(prop[1]) / gradeSplit.value)
-      array[index].count++
-      gradeRange.value?.set(prop[0], array)
+      let index = Math.floor(Number(prop[1]) / gradeSplit.value)
+      if (Number(prop[1]) >= (subjectFullscore.get(prop[0]) ?? 0))index = ((subjectFullscore.get(prop[0]) ?? 0) / gradeSplit.value) - 1
+      arr[index].count++
+      gradeRange.value?.set(prop[0], arr)
 
       const oldGradeInfo = gradeInfo.value.get(prop[0])
       gradeInfo.value.set(prop[0], {
@@ -431,7 +432,7 @@ function getInfo() {
   studentAPI.getGrade.all()
     .then((res: any) => {
       studentList.value = []
-      res.students.forEach((stu: StudentAPIResponse) => {
+      res.data.students.forEach((stu: StudentAPIResponse) => {
         studentList.value?.push(new StudentC(stu).toSimpleObj())
       })
       getGradeSplit()

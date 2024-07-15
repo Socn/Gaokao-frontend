@@ -5,23 +5,54 @@ meta:
 
 <script setup lang="ts">
 import VChart from '@visactor/vchart'
+import shuffle from 'lodash-es/shuffle'
+import Mock from 'mockjs'
 import studentAPI from '@/api/modules/student'
-import type { Student } from '@/interfaces/student'
+import { type Student, type StudentAPIResponse, StudentC } from '@/interfaces/student'
 import { subjectFullscore } from '@/interfaces/subject'
 import { subjectPropToNameFunc } from '@/utils/subjectPropToName'
+import randomGrade from '@/utils/randomGrade'
 
 const route = useRoute()
 const router = useRouter()
+
+// const studentNum = 5000
+// const studentList: Array<StudentAPIResponse> = []
+
+// function initStudentList() {
+//   for (let i = 1; i <= studentNum; i++) {
+//     const chose2 = Math.floor(Math.random() * 2)
+//     const chose4 = shuffle([randomGrade(60, 100, 80, 20) * 10, randomGrade(60, 100, 80, 20) * 10, -1, -1])
+//     const stu: StudentAPIResponse = {
+//       name: Mock.mock('@cname'),
+//       id: (i + 302111000).toString(),
+//       chinese: randomGrade(50, 150, 90, 60) * 10,
+//       math: randomGrade(50, 150, 80, 70) * 10,
+//       english: randomGrade(50, 150, 110, 60) * 10,
+//       physics: chose2 === 0 ? randomGrade(60, 100, 80, 20) * 10 : -1,
+//       history: chose2 === 1 ? randomGrade(40, 100, 70, 30) * 10 : -1,
+//       chemistry: chose4[0],
+//       biology: chose4[1],
+//       geography: chose4[2],
+//       politics: chose4[3],
+//     }
+//     studentList.push(stu)
+//   }
+// }
+// initStudentList()
+// studentList.forEach((value) => {
+//   studentAPI.addGrade(new StudentC(value))
+// })
 
 const studentInfo = ref<Student>()
 const gradeInfo = ref<Array<any>>([])
 const gradeInfoMap = ref<Map<any, any>>()
 const subjectsList = ['chinese', 'math', 'english', 'physics', 'history', 'chemistry', 'biology', 'politics', 'geography']
 
-onMounted(async () => {
-  await studentAPI.getGrade.byNameId('', route.params.id?.toString() ?? '')
+onMounted(() => {
+  studentAPI.getGrade.byNameId('', route.params.id?.toString() ?? '')
     .then((res: any) => {
-      studentInfo.value = res.students[0]
+      studentInfo.value = res.data.students[0]
       if (studentInfo.value === undefined) return
       gradeInfoMap.value = new Map(Object.entries(studentInfo.value ?? {}))
       subjectsList.forEach((subject) => {
@@ -38,92 +69,92 @@ onMounted(async () => {
       })
       gradeInfoMap.value.delete('name')
       gradeInfoMap.value.delete('id')
-    })
 
-  // Charts
-  const radar = {
-    type: 'radar',
-    data: [
-      {
-        id: 'radarData',
-        values: gradeInfo.value,
-      },
-    ],
-    categoryField: 'key',
-    valueField: 'normalized',
-    outerRadius: 0.8,
-    point: {
-      visible: false, // disable point
-    },
-    area: {
-      visible: true, // display area
-      state: {
-      // The style in the hover state of the area
-        hover: {
-          fillOpacity: 0.5,
+      // Charts
+      const radar = {
+        type: 'radar',
+        data: [
+          {
+            id: 'radarData',
+            values: gradeInfo.value,
+          },
+        ],
+        categoryField: 'key',
+        valueField: 'normalized',
+        outerRadius: 0.8,
+        point: {
+          visible: false, // disable point
         },
-      },
-    },
-    tooltip: {
-      dimension: {
-        content: {
-          value: (v: any) => {
-            return (v.value).toString()
+        area: {
+          visible: true, // display area
+          state: {
+            // The style in the hover state of the area
+            hover: {
+              fillOpacity: 0.5,
+            },
           },
         },
-      },
-    },
-    line: {
-      style: {
-        lineWidth: 4,
-      },
-    },
-    axes: [
-      {
-        orient: 'radius', // radius axis
-        zIndex: 100,
-        min: 0.2,
-        domainLine: {
-          visible: false,
+        tooltip: {
+          dimension: {
+            content: {
+              value: (v: any) => {
+                return (v.value).toString()
+              },
+            },
+          },
         },
-        label: {
-          visible: false,
-          space: 0,
+        line: {
           style: {
-            textAlign: 'center',
-            stroke: '#fff',
             lineWidth: 4,
           },
         },
-        grid: {
-          smooth: false,
-          style: {
-            lineDash: [0],
+        axes: [
+          {
+            orient: 'radius', // radius axis
+            zIndex: 100,
+            min: 0.2,
+            domainLine: {
+              visible: false,
+            },
+            label: {
+              visible: false,
+              space: 0,
+              style: {
+                textAlign: 'center',
+                stroke: '#fff',
+                lineWidth: 4,
+              },
+            },
+            grid: {
+              smooth: false,
+              style: {
+                lineDash: [0],
+              },
+            },
           },
-        },
-      },
-      {
-        orient: 'angle', // angle axis
-        zIndex: 50,
-        tick: {
-          visible: false,
-        },
-        domainLine: {
-          visible: false,
-        },
-        label: {
-          space: 20,
-        },
-        grid: {
-          style: {
-            lineDash: [0],
+          {
+            orient: 'angle', // angle axis
+            zIndex: 50,
+            tick: {
+              visible: false,
+            },
+            domainLine: {
+              visible: false,
+            },
+            label: {
+              space: 20,
+            },
+            grid: {
+              style: {
+                lineDash: [0],
+              },
+            },
           },
-        },
-      },
-    ],
-  }
-  const vchart = new VChart(radar, { dom: 'radarChart' })
-  vchart.renderSync()
+        ],
+      }
+      const vchart = new VChart(radar, { dom: 'radarChart' })
+      vchart.renderSync()
+    })
 })
 </script>
 
@@ -164,4 +195,5 @@ onMounted(async () => {
       </div>
     </PageMain>
   </div>
-</template>
+</template>, StudentAPIResponseimport randomGrade from '@/utils/randomGrade'
+import { shuffle } from 'lodash-es'

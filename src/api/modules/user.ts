@@ -3,22 +3,26 @@ import api from '../index'
 export default {
   // 登录
   login: (data: {
-    account: string
+    name: string
     password: string
-  }) => api.post('user/login', data, {
-    baseURL: '/mock/',
-  }),
+  }) => api.post('user/login', data),
 
   // 获取权限
-  permission: () => api.get('user/permission', {
-    baseURL: '/mock/',
-  }),
-
-  // 修改密码
-  passwordEdit: (data: {
-    password: string
-    newpassword: string
-  }) => api.post('user/password/edit', data, {
-    baseURL: '/mock/',
-  }),
+  permission: () => {
+    const role = localStorage.getItem('role')
+    let permissions: string[] = []
+    if (role === '1') {
+      permissions = [
+        'grade.edit',
+        'grade.add',
+      ]
+    }
+    return {
+      message: '',
+      success: true,
+      data: {
+        permissions,
+      },
+    }
+  },
 }

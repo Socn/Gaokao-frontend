@@ -1,5 +1,8 @@
 import api from '../index'
+import useUserStore from '@/store/modules/user'
 import type { StudentC } from '@/interfaces/student'
+
+const userStore = useUserStore()
 
 export default {
   getGrade: {
@@ -7,21 +10,31 @@ export default {
       name: string,
       id: string,
     ) => api.get(`student?name=${name}&id=${id}`, {
-      baseURL: '/mock/',
+      headers: {
+        Authorization: userStore.token,
+      },
     }),
     byCondition: (
       condition: string,
     ) => api.get(`student/condition?condition=${condition}`, {
-      baseURL: '/mock/',
+      headers: {
+        Authorization: userStore.token,
+      },
     }),
     all: () => api.get('student/condition?condition=', {
-      baseURL: '/mock/',
+      headers: {
+        Authorization: userStore.token,
+      },
     }),
   },
   editGrade: (stu: StudentC) => api.post('student/edit', stu.toAPIResponse(), {
-    baseURL: '/mock/',
+    headers: {
+      Authorization: userStore.token,
+    },
   }),
-  addGrade: (stu: StudentC) => api.post('student/add', stu.toAPIResponse(), {
-    baseURL: '/mock/',
+  addGrade: (stu: StudentC) => api.post('student/add', stu.toAPIResponse(10), {
+    headers: {
+      Authorization: userStore.token,
+    },
   }),
 }

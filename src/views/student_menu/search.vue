@@ -82,7 +82,7 @@ function searchAll() {
   studentAPI.getGrade.all()
     .then((res: any) => {
       studentList.value = []
-      res.students.forEach((stu: StudentAPIResponse) => {
+      res.data.students.forEach((stu: StudentAPIResponse) => {
         studentList.value?.push(new StudentC(stu))
       })
     })
@@ -91,7 +91,7 @@ function searchNameID(name: string, id: string) {
   studentAPI.getGrade.byNameId(name, id)
     .then((res: any) => {
       studentList.value = []
-      res.students.forEach((stu: StudentAPIResponse) => {
+      res.data.students.forEach((stu: StudentAPIResponse) => {
         studentList.value?.push(new StudentC(stu))
       })
     })
@@ -100,7 +100,7 @@ function searchCondition(condition: string) {
   studentAPI.getGrade.byCondition(condition)
     .then((res: any) => {
       studentList.value = []
-      res.students.forEach((stu: StudentAPIResponse) => {
+      res.data.students.forEach((stu: StudentAPIResponse) => {
         studentList.value?.push(new StudentC(stu))
       })
     })

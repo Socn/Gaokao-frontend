@@ -121,7 +121,8 @@ function startImportQueue() {
       }
       else {
         taskFailed.value++
-        taskMessage.value.push(response.message)
+        if (response.message.includes('Duplicate entry'))taskMessage.value.push('学号发生重复')
+        else taskMessage.value.push(response.message)
         errorQueue.push(curr)
       }
       if (taskSuccess.value + taskFailed.value === taskCount.value) {
@@ -151,7 +152,8 @@ function retryImport() {
         taskFailed.value--
       }
       else {
-        taskMessage.value.push(response.message)
+        if (response.message.includes('Duplicate entry'))taskMessage.value.push('学号发生重复')
+        else taskMessage.value.push(response.message)
         tempQueue.push(curr)
       }
       if (retryProgress.value === count) {
@@ -238,11 +240,11 @@ defineExpose({
               v-if="taskState !== 'waiting'"
               :percentage="getPercentage()"
               :stroke-width="20"
-              :format="formatProgressBar"
               style="width: 100%;"
-              text-inside
               :status="taskFailed === 0 ? 'success' : 'exception'"
-            />
+            >
+              <span style="font-size: var(--el-font-size-small);">{{ formatProgressBar() }}</span>
+            </el-progress>
             <div style="display: flex; justify-content: flex-end;width: 100%; margin-top: 8px;">
               <ElButton v-if="taskState === 'waiting'" style="margin-left: auto;" @click="() => funcs.close(false)">
                 取消
