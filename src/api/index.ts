@@ -38,12 +38,12 @@ api.interceptors.response.use(
      * 规则是当 status 为 1 时表示请求成功，为 0 时表示接口需要登录或者登录状态失效，需要重新登录
      * 请求出错时 error 会返回错误信息
      */
-    if (response.status !== 200) {
+    if (response.status === 200) {
       if (response.data.success !== true) {
         Message.error(response.data.message, {
           zIndex: 2000,
         })
-        return Promise.resolve(response.data)
+        return Promise.reject(response.data)
       }
     }
     return Promise.resolve(response.data)

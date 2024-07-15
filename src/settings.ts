@@ -7,6 +7,9 @@ const globalSettings: Settings.all = {
   app: {
     enablePermission: true,
   },
+  home: {
+    enable: false,
+  },
 }
 
 export default defaultsDeep(globalSettings, settingsDefault) as RecursiveRequired<Settings.all>

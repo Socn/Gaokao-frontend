@@ -121,7 +121,7 @@ function startImportQueue() {
       }
       else {
         taskFailed.value++
-        if (response.message.includes('Duplicate entry'))taskMessage.value.push('学号发生重复')
+        if (response.message.includes('Duplicate entry'))taskMessage.value.push(`学号发生重复:${curr.id}`)
         else taskMessage.value.push(response.message)
         errorQueue.push(curr)
       }
@@ -152,7 +152,7 @@ function retryImport() {
         taskFailed.value--
       }
       else {
-        if (response.message.includes('Duplicate entry'))taskMessage.value.push('学号发生重复')
+        if (response.message.includes('Duplicate entry'))taskMessage.value.push(`学号发生重复:${curr.id}`)
         else taskMessage.value.push(response.message)
         tempQueue.push(curr)
       }

@@ -7,7 +7,6 @@ meta:
 
 <script setup lang="ts">
 import type { FormInstance, FormRules } from 'element-plus'
-import { ElMessage } from 'element-plus'
 import Copyright from '@/layouts/components/Copyright/index.vue'
 import useSettingsStore from '@/store/modules/settings'
 import useUserStore from '@/store/modules/user'
@@ -72,7 +71,8 @@ function handleLogin() {
 
 function testAccount(name: string) {
   loginForm.value.name = name
-  loginForm.value.password = '123456'
+  if (name === 'admin') loginForm.value.password = 'testPassword'
+  else loginForm.value.password = '123456'
   handleLogin()
 }
 </script>

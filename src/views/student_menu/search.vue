@@ -13,7 +13,6 @@ import { useSessionStorage } from '@vueuse/core'
 import studentAPI from '../../api/modules/student'
 import type { Student, StudentAPIResponse } from '@/interfaces/student'
 import { StudentC, emptyStudentInfo } from '@/interfaces/student'
-import { getSubArray } from '@/utils/subArray'
 import type { FilterSelectElement } from '@/components/FilterSelect'
 import { subjectPropToNameFunc } from '@/utils/subjectPropToName'
 import { type StudentFilter, getWhereClause } from '@/utils/filters'
@@ -436,6 +435,7 @@ function handleJump(row: any) {
       <KeepAlive>
         <ElAutoResizer>
           <template #default="{ height }">
+            <span style="font-size: var(--el-font-size-base); line-height: 20px;">共{{ studentList.length }}条成绩</span>
             <GradeTable ref="tableRef" :data="studentList" :loading="loading" :max-table-height="String(height)" sty>
               <template #column>
                 <el-table-column label="操作" min-width="80" fixed="right">
