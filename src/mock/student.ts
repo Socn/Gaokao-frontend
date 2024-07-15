@@ -1,9 +1,8 @@
 import { defineFakeRoute } from 'vite-plugin-fake-server/client'
 import { shuffle } from 'lodash-es'
 import Mock from 'mockjs'
-import type { Student, StudentAPIResponse } from '@/interfaces/student'
+import type { StudentAPIResponse } from '@/interfaces/student'
 import randomGrade from '@/utils/randomGrade'
-import { generateNormalDistribution } from '@/utils/normalDistribution'
 
 const studentNum = 5000
 const studentList: Array<StudentAPIResponse> = []
@@ -45,7 +44,9 @@ export default defineFakeRoute([
       })
       return {
         success: true,
-        students: retList,
+        data: {
+          students: retList,
+        },
       }
     },
   },
@@ -58,7 +59,9 @@ export default defineFakeRoute([
       }
       return {
         success: true,
-        students: studentList,
+        data: {
+          students: studentList,
+        },
       }
     },
   },

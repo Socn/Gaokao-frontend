@@ -37,4 +37,9 @@ export default {
       Authorization: userStore.token,
     },
   }),
+  deleteGrade: (stu: StudentC) => api.post('student/delete', { name: stu.name, id: stu.id }, {
+    headers: {
+      Authorization: userStore.token,
+    },
+  }),
 }

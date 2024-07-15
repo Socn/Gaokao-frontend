@@ -107,7 +107,7 @@ function searchCondition(condition: string) {
 
 function searchStudent(): Promise<boolean> {
   if (tableRef.value !== undefined)tableRef.value.clearSort()
-  loading.value = true
+
   // no filters
   if (searchName.value === '' && searchID.value === '' && selected1.value === '' && cnt.value === 0 && filters.value.length === 0) {
     searchAll()
@@ -142,14 +142,18 @@ function searchStudent(): Promise<boolean> {
     else finalWhereClause = `${subjectWhereClause} AND ${filterWhereClause}`
     searchCondition(finalWhereClause)
   }
-  loading.value = false
-
+  //  console.log(studentList.value)
   return new Promise((resolve) => {
     resolve(true)
   })
 }
 const debouncedSearch = debounce(searchStudent, 250)
-const throttledSearch = throttle(searchStudent, 500)
+const throttledSearch = throttle(() => {
+  loading.value = true
+  searchStudent().then(() => {
+    loading.value = false
+  })
+}, 500)
 
 function select2(prop: 'physics' | 'history') {
   selected1.value = selected1.value === prop ? '' : prop
@@ -240,7 +244,9 @@ function handleImportClose(refresh: boolean) {
 // const debouncedSetHeight = throttle(setHeight, 500, { leading: true })
 
 // Get all students without filters on loading
-searchStudent()
+searchStudent().then(() => {
+  loading.value = false
+})
 
 // onMounted(() => {
 //   window.addEventListener('resize', debouncedSetHeight)
@@ -250,6 +256,19 @@ searchStudent()
 function handleJump(row: any) {
   router.push({
     path: `/students/detail/${row.id}`,
+  })
+}
+
+const confirmDelete = ref(false)
+function handleDeleteStudent() {
+  confirmDelete.value = true
+}
+
+function handleConfirmDelete() {
+  studentAPI.deleteGrade(new StudentC().fromStudent(editGradeInfo.value)).then(() => {
+    confirmDelete.value = false
+    editGradeVisible.value = false
+    nextTick(() => throttledSearch())
   })
 }
 </script>
@@ -311,6 +330,9 @@ function handleJump(row: any) {
       <EditGrade v-if="editGradeVisible" ref="editGrade" :stu="editGradeInfo" :can-return="editGradeCanReturnFunc" />
       <template #footer>
         <div class="dialog-footer">
+          <ElButton type="danger" @click="handleDeleteStudent">
+            删除该条成绩
+          </ElButton>
           <ElButton @click="editGradeVisible = false">
             取消
           </ElButton>
@@ -320,6 +342,25 @@ function handleJump(row: any) {
             @click="() => {
               handleEditGradeClose()
             }"
+          >
+            确定
+          </ElButton>
+        </div>
+      </template>
+    </el-dialog>
+
+    <el-dialog
+      v-model="confirmDelete" title="确定删除该条成绩？" width="300" style="color: black;"
+      :close-on-click-modal="false" :close-on-press-escape="false"
+    >
+      <template #footer>
+        <div class="dialog-footer">
+          <ElButton @click="confirmDelete = false">
+            取消
+          </ElButton>
+          <ElButton
+            type="danger"
+            @click="handleConfirmDelete"
           >
             确定
           </ElButton>
