@@ -1,6 +1,7 @@
 <route lang="yaml">
 meta:
   title: 总览
+  name: overall
 </route>
 
 <script setup lang="ts">
@@ -15,6 +16,10 @@ import studentAPI from '@/api/modules/student'
 import { subjectPropToName, subjectPropToNameFunc } from '@/utils/subjectPropToName'
 import type { Subject } from '@/interfaces/subject'
 import { subjectFullscore } from '@/interfaces/subject'
+
+defineOptions({
+  name: 'Overall',
+})
 
 const studentList = ref<Array<{
   name: string
@@ -480,7 +485,7 @@ function handleSwitchSubject() {
           </el-space>
         </el-space>
         <div>
-          <span>
+          <span style="display: block; height: 30px; line-height: 30px;">
             共{{ (gradeInfo.get(subject)?.count ?? 0) }}条成绩，
             平均{{ ((gradeInfo.get(subject)?.sum ?? 0) / (gradeInfo.get(subject)?.count ?? 1)).toFixed(3) }}分
           </span>

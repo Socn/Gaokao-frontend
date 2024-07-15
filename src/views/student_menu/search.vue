@@ -476,7 +476,7 @@ function handleConfirmDelete() {
       <KeepAlive>
         <ElAutoResizer>
           <template #default="{ height }">
-            <span style="font-size: var(--el-font-size-base); line-height: 20px;">共{{ studentList.length }}条成绩</span>
+            <span style=" display: block; height: 24px;font-size: var(--el-font-size-base); line-height: 24px;">共{{ studentList.length }}条成绩</span>
             <GradeTable ref="tableRef" :data="studentList" :loading="loading" :max-table-height="String(height)" sty>
               <template #column>
                 <el-table-column label="操作" min-width="80" fixed="right">

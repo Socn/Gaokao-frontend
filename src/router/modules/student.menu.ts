@@ -13,6 +13,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       title: '总览',
       icon: 'i-material-symbols:supervisor-account',
+      cache: ['search', 'searchPage'],
     },
     children: [
       {
@@ -23,6 +24,7 @@ const routes: Array<RouteRecordRaw> = [
           title: '总览',
           menu: false,
           breadcrumb: false,
+          cache: ['search', 'searchPage'],
         },
       },
     ],
