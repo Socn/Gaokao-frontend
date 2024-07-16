@@ -41,19 +41,19 @@ function handleCheckboxChange(index: any) {
 }
 
 function editUserRole() {
-  let ok = true
+  let cnt = 0
   changes.forEach((v, index) => {
     if (v === true) {
-      userAPI.editUser(users.value[index].name, Number(users.value[index].role)).catch(() => {
-        ok = false
+      userAPI.editUser(users.value[index].name, Number(users.value[index].role)).finally(() => {
+        cnt++
+        if (cnt === changeCount.value) {
+          getUserList()
+          changeCount.value = 0
+          changes = []
+        }
       })
     }
   })
-  if (ok) {
-    changes = []
-    changeCount.value = 0
-  }
-  getUserList()
 }
 
 const confirmDelete = ref(false)
@@ -70,7 +70,7 @@ function handleConfirmDelete() {
   <PageMain>
     <el-dialog
       v-model="addUserVisible" title="添加用户" width="300" style="color: black;"
-      :close-on-click-modal="false" :close-on-press-escape="false" @before-close="addUserInfo = { name: '', password: '', role: false } "
+      :close-on-click-modal="false" :close-on-press-escape="false" :before-close="() => addUserInfo = { name: '', password: '', role: false } "
     >
       <div v-if="addUserVisible">
         <div class="mb-4 flex gap-2">
