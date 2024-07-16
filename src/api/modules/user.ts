@@ -54,9 +54,9 @@ export default {
       },
     })
   },
-  addUser: (data: { name: string, password: string, role: boolean }) => {
+  addUser: (name: string, password: string, role: boolean) => {
     const userStore = useUserStore()
-    return api.post('/user/register', { ...data, role: Boolean(data.role) }, {
+    return api.post('/user/register', { name, password, role: Number(role) }, {
       headers: {
         Authorization: userStore.token,
       },

@@ -28,7 +28,7 @@ getUserList()
 const addUserVisible = ref(false)
 const addUserInfo = ref({ name: '', password: '', role: false })
 function handleAddUser() {
-  userAPI.addUser(addUserInfo.value).then(() => {
+  userAPI.addUser(addUserInfo.value.name, addUserInfo.value.password, addUserInfo.value.role).then(() => {
     addUserVisible.value = false
     getUserList()
   })
