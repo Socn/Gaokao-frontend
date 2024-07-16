@@ -12,7 +12,7 @@ defineOptions({
 
 const users = ref<{ name: string, role: boolean }[]>([])
 
-const changes: boolean[] = []
+let changes: boolean[] = []
 const changeCount = ref(0)
 
 function getUserList() {
@@ -41,11 +41,19 @@ function handleCheckboxChange(index: any) {
 }
 
 function editUserRole() {
+  let ok = true
   changes.forEach((v, index) => {
     if (v === true) {
-      userAPI.editUser(users.value[index].name, Number(!users.value[index].role))
+      userAPI.editUser(users.value[index].name, Number(users.value[index].role)).catch(() => {
+        ok = false
+      })
     }
   })
+  if (ok) {
+    changes = []
+    changeCount.value = 0
+  }
+  getUserList()
 }
 
 const confirmDelete = ref(false)
@@ -53,6 +61,7 @@ const deleteName = ref<string>('')
 function handleConfirmDelete() {
   userAPI.deleteUser(deleteName.value).then(() => {
     confirmDelete.value = false
+    getUserList()
   })
 }
 </script>
