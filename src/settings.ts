@@ -10,6 +10,9 @@ const globalSettings: Settings.all = {
   home: {
     enable: false,
   },
+  menu: {
+    switchMainMenuAndPageJump: true,
+  },
 }
 
 export default defaultsDeep(globalSettings, settingsDefault) as RecursiveRequired<Settings.all>

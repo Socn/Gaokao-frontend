@@ -15,6 +15,8 @@ export default {
       permissions = [
         'grade.edit',
         'grade.add',
+        'user.add',
+        'user.edit',
       ]
     }
     return {

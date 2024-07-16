@@ -13,7 +13,7 @@ export default defineFakeRoute([
           token: `${body.name}_@string`,
           user: {
             name: body.name,
-            role: 1,
+            role: body.name === 'admin' ? 1 : 0,
           },
         }),
       }

@@ -2,6 +2,7 @@ import { setupLayouts } from 'virtual:meta-layouts'
 import generatedRoutes from 'virtual:generated-pages'
 import type { RouteRecordRaw } from 'vue-router'
 import StudentMenu from './modules/student.menu.ts'
+import UserManageMenu from './modules/user.manage.menu.ts'
 import type { Route } from '#/global'
 import useSettingsStore from '@/store/modules/settings'
 
@@ -65,6 +66,13 @@ const asyncRoutes: Route.recordMainRaw[] = [
       icon: 'i-material-symbols:account-circle',
     },
     children: StudentMenu,
+  },
+  {
+    meta: {
+      title: '用户管理',
+      icon: 'i-material-symbols:switch-account-sharp',
+    },
+    children: UserManageMenu,
   },
 ]
 
