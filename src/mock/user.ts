@@ -61,4 +61,26 @@ export default defineFakeRoute([
       }
     },
   },
+  {
+    url: '/mock/user',
+    method: 'get',
+    response: () => {
+      return {
+        message: '',
+        success: true,
+        data: {
+          users: [
+            {
+              name: 'admin',
+              role: 1,
+            },
+            {
+              name: 'test',
+              role: 0,
+            },
+          ],
+        },
+      }
+    },
+  },
 ])

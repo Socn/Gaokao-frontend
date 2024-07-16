@@ -1,4 +1,5 @@
 import api from '../index'
+import useUserStore from '@/store/modules/user'
 
 export default {
   // 登录
@@ -26,5 +27,39 @@ export default {
         permissions,
       },
     }
+  },
+
+  getUsers: () => {
+    const userStore = useUserStore()
+    return api.get('/user', {
+      headers: {
+        Authorization: userStore.token,
+      },
+    })
+  },
+
+  deleteUser: (name: string) => {
+    const userStore = useUserStore()
+    return api.post('/user/delete', { name }, {
+      headers: {
+        Authorization: userStore.token,
+      },
+    })
+  },
+  editUser: (name: string, role: number) => {
+    const userStore = useUserStore()
+    return api.post('/user/edit', { name, role }, {
+      headers: {
+        Authorization: userStore.token,
+      },
+    })
+  },
+  addUser: (data: { name: string, password: string, role: boolean }) => {
+    const userStore = useUserStore()
+    return api.post('/user/register', { ...data, role: Boolean(data.role) }, {
+      headers: {
+        Authorization: userStore.token,
+      },
+    })
   },
 }
