@@ -13,7 +13,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       title: '总览',
       icon: 'i-material-symbols:supervisor-account',
-      cache: ['search', 'searchPage'],
+      cache: ['search', 'searchPage', 'user', 'usersPage'],
     },
     children: [
       {
@@ -24,7 +24,7 @@ const routes: Array<RouteRecordRaw> = [
           title: '总览',
           menu: false,
           breadcrumb: false,
-          cache: ['search', 'searchPage'],
+          cache: ['search', 'searchPage', 'user', 'usersPage'],
         },
       },
     ],
@@ -37,7 +37,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       title: '搜索',
       icon: 'i-material-symbols:search',
-      cache: ['detail', 'detailPage', 'overall', 'overallPage'],
+      cache: ['detail', 'detailPage', 'overall', 'overallPage', 'user', 'usersPage'],
     },
     children: [
       {
@@ -48,7 +48,7 @@ const routes: Array<RouteRecordRaw> = [
           title: '搜索',
           menu: false,
           breadcrumb: false,
-          cache: ['detail', 'detailPage', 'overall', 'overallPage'],
+          cache: ['detail', 'detailPage', 'overall', 'overallPage', 'user', 'usersPage'],
         },
       },
     ],
