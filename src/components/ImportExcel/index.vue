@@ -81,7 +81,7 @@ const taskFailed = ref<number>(0)
 const taskCount = ref<number>(0)
 const taskMessage = ref<Array<string>>([])
 
-const maxConcurrency = 20
+const maxConcurrency = 10
 
 function confirmImport() {
   importQueue = new Array<StudentC>()
@@ -102,67 +102,100 @@ function confirmImport() {
 }
 const retryProgress = ref<number>(0)
 const retryCount = ref<number>(0)
-async function _next(queue: Array<any>, index: number, maxIndex: number, response: any, func: Function) {
-  func(response)
-  const nextIndex = index + maxConcurrency
-  if (nextIndex >= maxIndex) return
-  const nextItem = queue[index + maxConcurrency]
-  studentAPI.addGrade(nextItem).then(response => _next(queue, nextIndex, maxIndex, response, func))
+async function _next(queue: Array<any>, index: number, currItem: StudentC, maxIndex: number, response: any, error: any, func: Function, errorCatch: Function, finallyFunc: Function) {
+  if (response === undefined && error === undefined) {
+    finallyFunc()
+    const nextIndex = index + maxConcurrency
+    if (nextIndex >= maxIndex) return
+    const nextItem = queue[index + maxConcurrency]
+    studentAPI.addGrade(nextItem)
+      .then(response => _next(queue, nextIndex, nextItem, maxIndex, response, undefined, func, errorCatch, finallyFunc))
+      .catch(error => _next(queue, nextIndex, nextItem, maxIndex, undefined, error, func, errorCatch, finallyFunc))
+      .finally(() => _next(queue, nextIndex, nextItem, maxIndex, undefined, undefined, func, errorCatch, finallyFunc))
+  }
+  else {
+    if (response !== undefined)func(response, currItem)
+    if (error !== undefined)errorCatch(error, currItem)
+  }
+}
+function thenFunc(response: any, item: StudentC) {
+  if (response.success === true) {
+    taskSuccess.value++
+  }
+  else {
+    taskFailed.value++
+    if (response.message.includes('Duplicate entry'))taskMessage.value.push(`学号发生重复:${item.id}`)
+    else taskMessage.value.push(response.message)
+    errorQueue.push(item)
+  }
+}
+function catchFunc(error: any, item: StudentC) {
+  taskFailed.value++
+  taskMessage.value.push(error.message)
+  errorQueue.push(item)
+}
+function finalFunc() {
+  if (taskSuccess.value + taskFailed.value === taskCount.value) {
+    if (taskFailed.value === 0)taskState.value = 'success'
+    else taskState.value = 'error'
+    retryCount.value = taskFailed.value
+  }
 }
 function startImportQueue() {
   let i = 0
   while (i < maxConcurrency) {
     const currIndex = i
     if (currIndex >= taskCount.value) return
-    const curr = importQueue[i]
-    studentAPI.addGrade(curr).then(response => _next(importQueue, currIndex, taskCount.value, response, (response: any) => {
-      if (response.success === true) {
-        taskSuccess.value++
-      }
-      else {
-        taskFailed.value++
-        if (response.message.includes('Duplicate entry'))taskMessage.value.push(`学号发生重复:${curr.id}`)
-        else taskMessage.value.push(response.message)
-        errorQueue.push(curr)
-      }
-      if (taskSuccess.value + taskFailed.value === taskCount.value) {
-        if (taskFailed.value === 0)taskState.value = 'success'
-        else taskState.value = 'error'
-        retryCount.value = taskFailed.value
-      }
-    }))
+    const currItem = importQueue[i]
+    studentAPI.addGrade(currItem)
+      .then(response => _next(importQueue, currIndex, currItem, taskCount.value, response, undefined, thenFunc, catchFunc, finalFunc))
+      .catch(error => _next(importQueue, currIndex, currItem, taskCount.value, undefined, error, thenFunc, catchFunc, finalFunc))
+      .finally(() => _next(importQueue, currIndex, currItem, taskCount.value, undefined, undefined, thenFunc, catchFunc, finalFunc))
     i++
+  }
+}
+
+let tempQueue = new Array<StudentC>()
+let count = 0
+function retryThenFunc(response: any, item: StudentC) {
+  retryProgress.value++
+  if (response.success === true) {
+    taskSuccess.value++
+    taskFailed.value--
+  }
+  else {
+    if (response.message.includes('Duplicate entry'))taskMessage.value.push(`学号发生重复:${item.id}`)
+    else taskMessage.value.push(response.message)
+    tempQueue.push(item)
+  }
+}
+function retryCatchFunc(error: any, item: StudentC) {
+  taskMessage.value.push(error.message)
+  tempQueue.push(item)
+}
+function retryFinalFunc() {
+  if (retryProgress.value === count) {
+    if (taskFailed.value === 0)taskState.value = 'success'
+    else taskState.value = 'retryError'
+
+    errorQueue = tempQueue
   }
 }
 function retryImport() {
   retryProgress.value = 0
   taskState.value = 'retrying'
   taskMessage.value = []
-  const tempQueue = new Array<StudentC>()
-  const count = errorQueue.length
+  tempQueue = new Array<StudentC>()
+  count = errorQueue.length
   let i = 0
   while (i < maxConcurrency) {
     const currIndex = i
     if (currIndex >= errorQueue.length) return
-    const curr = errorQueue[i]
-    studentAPI.addGrade(curr).then(response => _next(errorQueue, currIndex, errorQueue.length, response, (response: any) => {
-      retryProgress.value++
-      if (response.success === true) {
-        taskSuccess.value++
-        taskFailed.value--
-      }
-      else {
-        if (response.message.includes('Duplicate entry'))taskMessage.value.push(`学号发生重复:${curr.id}`)
-        else taskMessage.value.push(response.message)
-        tempQueue.push(curr)
-      }
-      if (retryProgress.value === count) {
-        if (taskFailed.value === 0)taskState.value = 'success'
-        else taskState.value = 'retryError'
-
-        errorQueue = tempQueue
-      }
-    }))
+    const currItem = errorQueue[i]
+    studentAPI.addGrade(currItem)
+      .then(response => _next(errorQueue, currIndex, currItem, errorQueue.length, response, undefined, retryThenFunc, retryCatchFunc, retryFinalFunc))
+      .catch(error => _next(errorQueue, currIndex, currItem, errorQueue.length, undefined, error, retryThenFunc, retryCatchFunc, retryFinalFunc))
+      .finally(() => _next(errorQueue, currIndex, currItem, errorQueue.length, undefined, undefined, retryThenFunc, retryCatchFunc, retryFinalFunc))
     i++
   }
   // while (i < count) {
